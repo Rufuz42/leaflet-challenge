@@ -70,8 +70,8 @@ d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/
     // load the data with geojson
     L.geoJson(plateData, {
         // Add style to see the lines
-        color: "orange",
-        weight: 1
+        color: "#7B68EE",
+        weight: 3
     }).addTo(tectonicPlates);
 });
 
@@ -93,17 +93,17 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
         // Choose the color function
         function colorChoice(depth){
             if (depth > 90)
-                return "red";
+                return "#8B0000";
             else if (depth > 70)
-                return "orange";
+                return "#FF4500";
             else if (depth > 50)
-                return "light orange"
+                return "#FFA500"
             else if (depth > 30)
-                return "yellow"
+                return "#FFEC8B"
             else if (depth > 10)
-                return "light green";
+                return "#3CB371";
             else 
-                return "green"
+                return "#006400"
         }
 
         // Determine radius size
@@ -117,10 +117,10 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
         // Style the earthquake circles on the map
         function style(feature){
             return {
-                opacity: 0.75,
-                fillOpacity: 0.75,
+                opacity: 0.45,
+                fillOpacity: 0.45,
                 fillColor: colorChoice(feature.geometry.coordinates[2]),
-                color: "black",
+                color: colorChoice(feature.geometry.coordinates[2]),
                 radius: radiusSize(feature.properties.mag),
                 weight: 0.5
             }
@@ -134,7 +134,11 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
             // Set the marker styles
             style: style,
             // Popups
-
+            onEachFeature: function(feature, layer){
+                layer.bindPopup(`Magnidtude: <b>${feature.properties.mag}</b><br>
+                                Depth: <b>${feature.geometry.coordinates[2]}</b><br>
+                                Location: <b>${feature.properties.place}</b>`)
+            }
         }).addTo(earthquakes);
     }
 )
@@ -150,3 +154,44 @@ var overlayMaps = {
 L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
 }).addTo(map);
+
+// make a variable for the legend and position it in the bottom right of the screen
+var legend = L.control(
+    {
+        position: "bottomright"
+    }
+  );
+  // add the properties for the legend
+  legend.onAdd = function()
+  {
+    // create a div for the legend
+    var div = L.DomUtil.create("div", "info legend");
+    // console.log(div);
+    var intervals = [-10, 10, 30, 50, 70, 90]; // this array represents the intervals
+                                 // for the earthquake magnitude depths
+    // this array represents the colors that will be associated with the intervals
+    var colors = [
+        "#006400",
+        "#3CB371",
+        "#FFEC8B",
+        "#FFA500",
+        "#FF4500",
+        "#8B0000"
+    ];
+    // use a loop to generate labels within the div
+    // div starts as empty, then is populated with the data from the arrays
+    for(var i = 0; i < intervals.length; i++)
+    {
+        // display the colors and the interval values
+        //console.log(colors[i]);
+        //console.log(intervals[i]);
+        // use .innerHTML to set the value of the color and the text for the interval
+        div.innerHTML += "<i style='background: " + colors[i] + "'></i>"
+        + intervals[i]
+        + (intervals[i + 1] ? " &ndash; " + intervals[i+1] + " Depth<br>" :
+        "+ Depth");
+    }
+    return div;
+  };
+  // add the legend to the map
+legend.addTo(map);
