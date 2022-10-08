@@ -43,7 +43,7 @@ var baseMaps = {
 
 // Make the map object
 var map = L.map("map", {
-    center: [40.7608, -111.8910],
+    center: [40.7608, -111.8910],  // Salt Lake City, Utah
     zoom: 5,
     layers: [Stadia_AlidadeSmoothDark, grayscale, waterColor, USGS_USImageryTopo, OpenStreetMap_Mapnik]
 });
